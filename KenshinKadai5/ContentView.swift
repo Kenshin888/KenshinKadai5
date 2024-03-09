@@ -10,7 +10,8 @@ import SwiftUI
 struct ContentView: View {
     @State var divided: String = ""
     @State var divide: String = ""
-    @State var anser: String = ""
+    @State var answer: String = ""
+
     var body: some View {
         VStack {
             HStack {
@@ -19,24 +20,26 @@ struct ContentView: View {
                 CustomField(num: $divide)
             }
             Button("計算") {
-                guard let firstnum = Float(divided), let secondnum = Float(divide) else {
-                    if divided == "" {
-                        anser = "割られる数を入力してください"
-                    } else if divide == "" {
-                        anser = "割る数を入力してください"
-                    }
+                guard let firstnum = Float(divided) else {
+                    answer = "割られる数を入力してください"
                     return
                 }
 
-                if let firstnum = Float(divided) , let secondnum = Float(divide) {
-                    if secondnum == 0 {
-                        anser = "割る数には0以外を入力してください"
-                    } else {
-                        anser = "\(round(firstnum / secondnum * 100000) / 100000)"
-                    }
+                guard let secondnum = Float(divide) else {
+                    answer = "割る数を入力してください"
+                    return
                 }
+
+                guard secondnum != 0 else {
+                    answer = "割る数には0以外を入力してください"
+                    return
+                }
+
+                let formatter = NumberFormatter()
+                formatter.maximumFractionDigits = 5
+                answer = formatter.string(from: NSNumber(value: firstnum / secondnum)) ?? ""
             }
-            Text(anser)
+            Text(answer)
         }
     }
 }
@@ -44,7 +47,7 @@ struct ContentView: View {
 struct CustomField: View {
     @Binding var num: String
     var body: some View {
-        TextField("",text: $num)
+        TextField("", text: $num)
             .keyboardType(.numberPad)
             .border(Color.gray, width: 1)
             .padding()
